@@ -96,6 +96,10 @@ const Modal = styled.div`
         p:first-child {
           color: grey;
         }
+
+        p:last-child span {
+          color: green;
+        }
       }
     }
   }
@@ -276,7 +280,7 @@ export default class App extends React.Component {
                   <div className="modal__info--details">
                     <p>{this.state.currentFilm.name}</p>
                     <p>Год: {this.state.currentFilm.year}</p>
-                    <p>Рейтинг: {this.state.currentFilm.rating ? this.state.currentFilm.rating : 'Нет'}</p>
+                    <p>Рейтинг: <span>{this.state.currentFilm.rating ? this.state.currentFilm.rating : 'Нет'}</span></p>
                   </div>
                 </div>
                 <p className="modal__description">
