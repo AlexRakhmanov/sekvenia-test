@@ -1,8 +1,9 @@
-import React from 'react';
-import styled from 'styled-components'; 
-import axios from 'axios';
-import Card from './Components/Card';
+import React   from 'react';
+import styled  from 'styled-components'; 
+import axios   from 'axios';
+import Card    from './Components/Card';
 import Spinner from './Components/Spinner';
+import Modal   from './Components/Modal';
 
 const H1 = styled.h1`
   text-align: center;
@@ -46,65 +47,6 @@ const CategoryFilms = styled.ul`
   margin: 10px 0;
 `;
 
-const Modal = styled.div`
-  position: fixed;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.25);
-  z-index: 4;
-  top: 0;
-  left: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  .modal {
-    background-color: white;
-    padding: 10px;
-    max-width: 620px;
-    border-radius: 10px;
-
-    &__header {
-      display: flex;
-      justify-content: space-between;
-      border-bottom: 1px solid grey;
-      margin-bottom: 10px;
-
-      &--title {
-        margin: 0 0 0 10px;
-      }
-    }
-
-    &__button {
-      cursor: pointer;
-    }
-
-    &__info {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-
-      &--image {
-        width: 200px;
-
-        img {
-          width: 200px;
-        }
-      }
-
-      &--details {
-        p:first-child {
-          color: grey;
-        }
-
-        p:last-child span {
-          color: green;
-        }
-      }
-    }
-  }
-`;
-
 export default class App extends React.Component {  
   constructor() {
     super();
@@ -135,18 +77,16 @@ export default class App extends React.Component {
     });
   }
 
-  handleOptionChange = (event) => {
-    if (event.target.name === 'rate') {
-      this.setState({
-        sortRating: event.target.value
-      });
-    } 
+  handleRatingChange = (event) => {
+    this.setState({
+      sortRating: event.target.value
+    }); 
+  }
 
-    if (event.target.name === 'year') {
-      this.setState({
-        sortYear: event.target.value
-      });
-    } 
+  handleYearChange = (event) => {
+    this.setState({
+      sortYear: event.target.value
+    });
   }
 
   handleClick = (film) => {
@@ -177,20 +117,18 @@ export default class App extends React.Component {
                 <input 
                   type="radio"
                   checked={this.state.sortYear === 'asc'} 
-                  name="year" 
                   id="yearasc" 
                   value="asc"
-                  onChange={this.handleOptionChange}
+                  onChange={this.handleYearChange}
                 />
                 <label htmlFor="yearasc">По возрастанию</label>
 
                 <input 
                   type="radio" 
-                  name="year" 
                   id="yeardesc" 
                   value="desc"
                   checked={this.state.sortYear === 'desc'} 
-                  onChange={this.handleOptionChange}
+                  onChange={this.handleYearChange}
                 />
                 <label htmlFor="yeardesc">По убыванию</label>
               </div>
@@ -200,21 +138,19 @@ export default class App extends React.Component {
               <div>
                 <input 
                   type="radio" 
-                  name="rate" 
                   id="rateasc" 
                   value="asc"
                   checked={this.state.sortRating === 'asc'} 
-                  onChange={this.handleOptionChange}
+                  onChange={this.handleRatingChange}
                 />
                 <label htmlFor="rateasc">По возрастанию</label>
 
                 <input 
                   type="radio" 
                   checked={this.state.sortRating === 'desc'}  
-                  name="rate" 
                   id="ratedesc" 
                   value="desc"
-                  onChange={this.handleOptionChange}
+                  onChange={this.handleRatingChange}
                 />
                 <label htmlFor="ratedesc">По убыванию</label>
               </div>
@@ -228,7 +164,7 @@ export default class App extends React.Component {
                   {film}
                 </CategoryYear>
                 <CategoryFilms>
-                  {this.state.sortRating === 'desc' && films[film].map((item) => {
+                  {this.state.sortRating === 'desc' && films[film].reverse().map((item) => {
                     return <Card handleClick={this.handleClick} data={item} key={item.id}/>;
                   })}
                   {this.state.sortRating === 'asc' && films[film].reverse().map((item) => {
@@ -246,11 +182,11 @@ export default class App extends React.Component {
                   {film}
                 </CategoryYear>
                 <CategoryFilms>
-                  {this.state.sortRating === 'desc' && films[film].map((item) => {
-                    return <Card data={item} key={item.id}/>;
+                  {this.state.sortRating === 'desc' && films[film].reverse().map((item) => {
+                    return <Card handleClick={this.handleClick} data={item} key={item.id}/>;
                   })}
                   {this.state.sortRating === 'asc' && films[film].reverse().map((item) => {
-                    return <Card data={item} key={item.id}/>;
+                    return <Card handleClick={this.handleClick} data={item} key={item.id}/>;
                   })}
                 </CategoryFilms>
               </Category>
@@ -261,34 +197,10 @@ export default class App extends React.Component {
         </main>
 
         {this.state.currentFilm && 
-          <Modal>
-            <article className="modal">
-              <header className="modal__header">
-                <span
-                  className="modal__button modal__button--close"
-                  onClick={this.closeModal}
-                >
-                  X
-                </span>
-                <h3 className="modal__header--title">{this.state.currentFilm.localized_name}</h3>
-              </header>
-              <section className="modal__content">
-                <div className="modal__info">
-                  <div className="modal__info--image">
-                    <img src={this.state.currentFilm.image_url} alt="Постер" />
-                  </div>
-                  <div className="modal__info--details">
-                    <p>{this.state.currentFilm.name}</p>
-                    <p>Год: {this.state.currentFilm.year}</p>
-                    <p>Рейтинг: <span>{this.state.currentFilm.rating ? this.state.currentFilm.rating : 'Нет'}</span></p>
-                  </div>
-                </div>
-                <p className="modal__description">
-                  {this.state.currentFilm.description}
-                </p>
-              </section>
-            </article>
-          </Modal>
+          <Modal 
+            data={this.state.currentFilm}
+            closeModal={this.closeModal}
+          />
         }
         
         <Footer>

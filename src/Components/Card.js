@@ -36,7 +36,7 @@ export default class Card extends React.Component {
   static propTypes = {
     data: PropTypes.object.isRequired,
     handleClick: PropTypes.func.isRequired
-  };
+  }
 
   render() {
     const film = this.props.data;
